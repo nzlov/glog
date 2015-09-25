@@ -14,3 +14,5 @@ func (self *Console) Name() string {
 func (self *Console) Event(e glog.Event) {
 	fmt.Printf("[%s][%s]%s %s", e.Level, e.Time.Format("2006-01-02 15:04:05"), e.Data, e.Message)
 }
+func (self *Console) Close() {
+}

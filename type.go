@@ -154,7 +154,8 @@ func (self Filed) Debugln(args ...interface{}) {
 type Level uint8
 
 const (
-	ErrorLevel Level = iota
+	UnknownLevel Level = iota
+	ErrorLevel
 	WarnLevel
 	InfoLevel
 	DebugLevel

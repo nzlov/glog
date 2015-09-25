@@ -60,6 +60,10 @@ func Close() {
 	isRunning = false
 	<-done
 	close(events)
+
+	for _, l := range listeners {
+		l.Close()
+	}
 }
 
 func Error(args ...interface{}) {

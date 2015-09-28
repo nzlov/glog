@@ -2,6 +2,7 @@ package udp
 
 import (
 	"encoding/json"
+	"fmt"
 	"net"
 
 	"github.com/nzlov/glog"
@@ -33,6 +34,7 @@ func (self *Udp) Name() string {
 func (self *Udp) Event(e glog.Event) {
 	b, err := json.Marshal(e)
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 	self.udp.Write(b)

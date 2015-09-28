@@ -8,6 +8,9 @@ import (
 type Console struct {
 }
 
+func New() *Console {
+	return &Console{}
+}
 func (self *Console) Name() string {
 	return "Console"
 }

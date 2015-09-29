@@ -40,18 +40,21 @@ func le() {
 			for _, l := range listeners {
 				l.Event(e)
 			}
+		case <-time.After(time.Millisecond * 500):
+
 		}
 	}
 
 	for {
 		select {
-		case <-time.After(time.Microsecond):
-			done <- true
-			return
 		case e := <-events:
 			for _, l := range listeners {
 				l.Event(e)
 			}
+		case <-time.After(time.Millisecond * 500):
+			done <- true
+			return
+
 		}
 	}
 }

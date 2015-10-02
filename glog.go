@@ -40,7 +40,7 @@ func le() {
 			for _, l := range listeners {
 				l.Event(e)
 			}
-		case <-time.After(time.Millisecond * 500):
+		case <-time.After(time.Millisecond * 100):
 
 		}
 	}
@@ -51,7 +51,7 @@ func le() {
 			for _, l := range listeners {
 				l.Event(e)
 			}
-		case <-time.After(time.Millisecond * 500):
+		case <-time.After(time.Millisecond):
 			done <- true
 			return
 

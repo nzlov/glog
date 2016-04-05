@@ -34,24 +34,29 @@ func event(e Event) {
 }
 
 func le() {
+	d := time.Millisecond * 10
+	t := time.NewTimer(d)
+	defer t.Stop()
 	for isRunning {
+		t.Reset(d)
 		select {
 		case e := <-events:
 			for _, l := range listeners {
 				l.Event(e)
 			}
-		case <-time.After(time.Millisecond * 100):
+		case <-t.C:
 
 		}
 	}
 
 	for {
+		t.Reset(time.Millisecond)
 		select {
 		case e := <-events:
 			for _, l := range listeners {
 				l.Event(e)
 			}
-		case <-time.After(time.Millisecond):
+		case <-t.C:
 			done <- true
 			return
 
@@ -60,12 +65,47 @@ func le() {
 }
 
 func Close() {
+	if !isRunning {
+		return
+	}
+
 	isRunning = false
 	<-done
 	close(events)
 
 	for _, l := range listeners {
 		l.Close()
+	}
+}
+
+func Fatal(args ...interface{}) {
+	if level >= FatalLevel {
+		event(Event{
+			Level:   FatalLevel,
+			Message: fmt.Sprint(args...),
+			Time:    time.Now(),
+			Data:    nil,
+		})
+	}
+}
+func Fatalf(format string, args ...interface{}) {
+	if level >= FatalLevel {
+		event(Event{
+			Level:   FatalLevel,
+			Message: fmt.Sprintf(format, args...),
+			Time:    time.Now(),
+			Data:    nil,
+		})
+	}
+}
+func Fatalln(args ...interface{}) {
+	if level >= FatalLevel {
+		event(Event{
+			Level:   FatalLevel,
+			Message: fmt.Sprintln(args...),
+			Time:    time.Now(),
+			Data:    nil,
+		})
 	}
 }
 

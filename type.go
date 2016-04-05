@@ -26,6 +26,36 @@ func (self Filed) String() string {
 	s = s + ""
 	return s
 }
+func (self Filed) Fatal(args ...interface{}) {
+	if level >= ErrorLevel {
+		event(Event{
+			Level:   FatalLevel,
+			Message: fmt.Sprint(args...),
+			Time:    time.Now(),
+			Data:    self,
+		})
+	}
+}
+func (self Filed) Fatalf(format string, args ...interface{}) {
+	if level >= ErrorLevel {
+		event(Event{
+			Level:   FatalLevel,
+			Message: fmt.Sprintf(format, args...),
+			Time:    time.Now(),
+			Data:    self,
+		})
+	}
+}
+func (self Filed) Fatalln(args ...interface{}) {
+	if level >= ErrorLevel {
+		event(Event{
+			Level:   FatalLevel,
+			Message: fmt.Sprintln(args...),
+			Time:    time.Now(),
+			Data:    self,
+		})
+	}
+}
 
 func (self Filed) Error(args ...interface{}) {
 	if level >= ErrorLevel {
@@ -155,6 +185,7 @@ type Level uint8
 
 const (
 	UnknownLevel Level = iota
+	FatalLevel
 	ErrorLevel
 	WarnLevel
 	InfoLevel
@@ -171,6 +202,8 @@ func (level Level) String() string {
 		return "warning"
 	case ErrorLevel:
 		return "error"
+	case FatalLevel:
+		return "fatal"
 	}
 
 	return "unknown"
@@ -178,6 +211,8 @@ func (level Level) String() string {
 
 func ParseLevel(lvl string) (Level, error) {
 	switch lvl {
+	case "fatal":
+		return FatalLevel, nil
 	case "error":
 		return ErrorLevel, nil
 	case "warn", "warning":

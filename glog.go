@@ -2,8 +2,11 @@ package glog
 
 import (
 	"fmt"
+	"runtime"
 	"time"
 )
+
+var MAXSTACK int = 10
 
 var listeners map[string]Listener
 var level Level
@@ -68,44 +71,30 @@ func Close() {
 	if !isRunning {
 		return
 	}
-
+	if err := recover(); err != nil {
+		errstr := fmt.Sprintf("Runtime error:%v\ntraceback:\n", err)
+		i := 1
+		for {
+			pc, file, line, ok := runtime.Caller(i)
+			if !ok || i > MAXSTACK {
+				break
+			}
+			errstr += fmt.Sprintf("\tstack: %d %v [file:%s][line:%d][func:%s]\n", i, ok, file, line, runtime.FuncForPC(pc).Name())
+			i++
+		}
+		event(Event{
+			Level:   PanicLevel,
+			Message: errstr,
+			Time:    time.Now(),
+			Data:    nil,
+		})
+	}
 	isRunning = false
 	<-done
 	close(events)
 
 	for _, l := range listeners {
 		l.Close()
-	}
-}
-
-func Fatal(args ...interface{}) {
-	if level >= FatalLevel {
-		event(Event{
-			Level:   FatalLevel,
-			Message: fmt.Sprint(args...),
-			Time:    time.Now(),
-			Data:    nil,
-		})
-	}
-}
-func Fatalf(format string, args ...interface{}) {
-	if level >= FatalLevel {
-		event(Event{
-			Level:   FatalLevel,
-			Message: fmt.Sprintf(format, args...),
-			Time:    time.Now(),
-			Data:    nil,
-		})
-	}
-}
-func Fatalln(args ...interface{}) {
-	if level >= FatalLevel {
-		event(Event{
-			Level:   FatalLevel,
-			Message: fmt.Sprintln(args...),
-			Time:    time.Now(),
-			Data:    nil,
-		})
 	}
 }
 

@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"runtime"
+	"time"
 
 	"github.com/nzlov/glog"
 	"github.com/nzlov/glog/listener/console"
+	"github.com/nzlov/glog/listener/file"
 )
 
 func panicf() {
@@ -25,18 +27,28 @@ func panicf() {
 }
 func main() {
 	defer glog.Close()
-	//	defer glog.Panicf()
-	glog.Register(console.New())
 	glog.SetLevel(glog.DebugLevel)
+	glog.Register(console.New())
+	f, err := file.New("l.log")
+	if err != nil {
+		panic(err)
+	}
+	glog.Register(f)
 
 	a()
 }
-
 func a() {
-	glog.Infoln("aaaaaaaa")
-	glog.Infoln("aaaaaaaa1")
-	glog.Infoln("aaaaaaaa2")
-	glog.Infoln("aaaaaaaa3")
-	glog.Infoln("aaaaaaaa4")
+	go func() {
+		i := 1
+		for {
+			glog.Infoln(i)
+			i++
+			time.Sleep(time.Millisecond)
+		}
+	}()
+	time.Sleep(time.Second)
+	a1()
+}
+func a1() {
 	panic("eeee")
 }

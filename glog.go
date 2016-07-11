@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-var MAXSTACK int = 10
+var MAXSTACK int = 99
 
 var listeners map[string]Listener
 var level Level
@@ -17,13 +17,14 @@ var done chan bool
 func init() {
 	listeners = make(map[string]Listener)
 	level = InfoLevel
-	events = make(chan Event, 99)
+	events = make(chan Event, MAXSTACK)
 	done = make(chan bool)
 	isRunning = true
 	go le()
 }
 
 func Register(l Listener) {
+	l.Start()
 	listeners[l.Name()] = l
 }
 func SetLevel(l Level) {
@@ -37,34 +38,16 @@ func event(e Event) {
 }
 
 func le() {
-	d := time.Millisecond * 10
-	t := time.NewTimer(d)
-	defer t.Stop()
-	for isRunning {
-		t.Reset(d)
-		select {
-		case e := <-events:
-			for _, l := range listeners {
-				l.Event(e)
-			}
-		case <-t.C:
-
-		}
-	}
-
 	for {
-		t.Reset(time.Millisecond)
-		select {
-		case e := <-events:
-			for _, l := range listeners {
-				l.Event(e)
-			}
-		case <-t.C:
-			done <- true
-			return
-
+		e, ok := <-events
+		if !ok {
+			break
+		}
+		for _, l := range listeners {
+			l.Notify() <- e
 		}
 	}
+	done <- true
 }
 
 func Close() {
@@ -73,13 +56,13 @@ func Close() {
 	}
 	if err := recover(); err != nil {
 		errstr := fmt.Sprintf("Runtime error:%v\ntraceback:\n", err)
-		i := 1
+		i := 3
 		for {
 			pc, file, line, ok := runtime.Caller(i)
 			if !ok || i > MAXSTACK {
 				break
 			}
-			errstr += fmt.Sprintf("\tstack: %d %v [file:%s][line:%d][func:%s]\n", i, ok, file, line, runtime.FuncForPC(pc).Name())
+			errstr += fmt.Sprintf("\tstack: %d %v [file:%s][line:%d][func:%s]\n", i-2, ok, file, line, runtime.FuncForPC(pc).Name())
 			i++
 		}
 		event(Event{
@@ -90,11 +73,10 @@ func Close() {
 		})
 	}
 	isRunning = false
-	<-done
 	close(events)
-
+	<-done
 	for _, l := range listeners {
-		l.Close()
+		<-l.Stop()
 	}
 }
 

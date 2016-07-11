@@ -11,10 +11,16 @@ import (
 type Udp struct {
 	host string
 	udp  *net.UDPConn
+
+	notify chan glog.Event
+	quit   chan bool
 }
 
 func New(host string) (*Udp, error) {
-	u := &Udp{}
+	u := &Udp{
+		notify: make(chan glog.Event, 10),
+		quit:   make(chan bool),
+	}
 	addr, err := net.ResolveUDPAddr("udp4", host)
 	if err != nil {
 		return nil, err
@@ -29,16 +35,33 @@ func New(host string) (*Udp, error) {
 }
 
 func (self *Udp) Name() string {
-	return "udp" + self.host
+	return "udp:" + self.host
 }
-func (self *Udp) Event(e glog.Event) {
-	b, err := json.Marshal(e)
-	if err != nil {
-		fmt.Println(err)
-		return
+func (self *Udp) Notify() chan glog.Event {
+	return self.notify
+}
+
+func (self *Udp) event() {
+	for {
+		e, ok := <-self.notify
+		if !ok {
+			break
+		}
+		b, err := json.Marshal(e)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		self.udp.Write(b)
 	}
-	self.udp.Write(b)
-}
-func (self *Udp) Close() {
 	self.udp.Close()
+	self.quit <- true
+}
+func (self *Udp) Stop() chan bool {
+	close(self.notify)
+	return self.quit
+}
+
+func (self *Udp) Start() {
+	go self.event()
 }

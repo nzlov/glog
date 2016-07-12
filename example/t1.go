@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"runtime"
 	"time"
 
 	"github.com/nzlov/glog"
@@ -10,30 +8,15 @@ import (
 	"github.com/nzlov/glog/listener/file"
 )
 
-func panicf() {
-	if err := recover(); err != nil {
-		errstr := fmt.Sprintf("Runtime error:%v\ntraceback:\n", err)
-		i := 1
-		for {
-			pc, file, line, ok := runtime.Caller(i)
-			errstr += fmt.Sprintf("\tstack: %d %v [file:%s][line:%d][func:%s]\n", i, ok, file, line, runtime.FuncForPC(pc).Name())
-			i++
-			if !ok || i > glog.MAXSTACK {
-				break
-			}
-		}
-		fmt.Println(errstr)
-	}
-}
 func main() {
 	defer glog.Close()
 	glog.SetLevel(glog.DebugLevel)
-	glog.Register(console.New())
 	f, err := file.New("l.log")
 	if err != nil {
 		panic(err)
 	}
 	glog.Register(f)
+	glog.Register(console.New())
 
 	a()
 }
@@ -42,6 +25,12 @@ func a() {
 		i := 1
 		for {
 			glog.Infoln(i)
+			glog.NewFiled().
+				Set("k", "v").
+				Set("k1", "v1").
+				Infoln(i)
+			glog.NewTagFiled("tag").
+				Set("k", "v").Infoln(i)
 			i++
 			time.Sleep(time.Millisecond)
 		}

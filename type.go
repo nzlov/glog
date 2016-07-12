@@ -11,19 +11,20 @@ func NewFiled() Filed {
 	return Filed{}
 }
 
-func (self Filed) Set(k string, v interface{}) {
+func (self Filed) Set(k string, v interface{}) Filed {
 	self[k] = v
+	return self
 }
 func (self Filed) Get(k string) (interface{}, bool) {
 	v, b := self[k]
 	return v, b
 }
 func (self Filed) String() string {
-	s := ""
+	s := "["
 	for k, v := range self {
 		s = s + fmt.Sprintf(" %s=%s", k, v)
 	}
-	s = s + ""
+	s = s + " ]"
 	return s
 }
 func (self Filed) Error(args ...interface{}) {
@@ -150,6 +151,162 @@ func (self Filed) Debugln(args ...interface{}) {
 	}
 }
 
+type TagFiled struct {
+	tag   string
+	value map[string]interface{}
+}
+
+func NewTagFiled(tag string) *TagFiled {
+	return &TagFiled{tag: tag, value: make(map[string]interface{})}
+}
+
+func (self *TagFiled) Set(k string, v interface{}) *TagFiled {
+	self.value[k] = v
+	return self
+}
+func (self *TagFiled) Get(k string) (interface{}, bool) {
+	v, b := self.value[k]
+	return v, b
+}
+func (self *TagFiled) GetTag() string {
+	return self.tag
+}
+func (self *TagFiled) SetTag(tag string) *TagFiled {
+	self.tag = tag
+	return self
+}
+func (self *TagFiled) String() string {
+	s := "[" + self.tag + "]["
+	for k, v := range self.value {
+		s = s + fmt.Sprintf(" %s=%s", k, v)
+	}
+	s = s + " ]"
+	return s
+}
+func (self *TagFiled) Error(args ...interface{}) {
+	if level >= ErrorLevel {
+		event(Event{
+			Level:   ErrorLevel,
+			Message: fmt.Sprint(args...),
+			Time:    time.Now(),
+			Data:    self,
+		})
+	}
+}
+func (self *TagFiled) Errorf(format string, args ...interface{}) {
+	if level >= ErrorLevel {
+		event(Event{
+			Level:   ErrorLevel,
+			Message: fmt.Sprintf(format, args...),
+			Time:    time.Now(),
+			Data:    self,
+		})
+	}
+}
+func (self *TagFiled) Errorln(args ...interface{}) {
+	if level >= ErrorLevel {
+		event(Event{
+			Level:   ErrorLevel,
+			Message: fmt.Sprintln(args...),
+			Time:    time.Now(),
+			Data:    self,
+		})
+	}
+}
+
+func (self *TagFiled) Warn(args ...interface{}) {
+	if level >= WarnLevel {
+		event(Event{
+			Level:   WarnLevel,
+			Message: fmt.Sprint(args...),
+			Time:    time.Now(),
+			Data:    self,
+		})
+	}
+}
+func (self *TagFiled) Warnf(format string, args ...interface{}) {
+	if level >= WarnLevel {
+		event(Event{
+			Level:   WarnLevel,
+			Message: fmt.Sprintf(format, args...),
+			Time:    time.Now(),
+			Data:    self,
+		})
+	}
+}
+func (self *TagFiled) Warnln(args ...interface{}) {
+	if level >= WarnLevel {
+		event(Event{
+			Level:   WarnLevel,
+			Message: fmt.Sprintln(args...),
+			Time:    time.Now(),
+			Data:    self,
+		})
+	}
+}
+
+func (self *TagFiled) Info(args ...interface{}) {
+	if level >= InfoLevel {
+		event(Event{
+			Level:   InfoLevel,
+			Message: fmt.Sprint(args...),
+			Time:    time.Now(),
+			Data:    self,
+		})
+	}
+}
+func (self *TagFiled) Infof(format string, args ...interface{}) {
+	if level >= InfoLevel {
+		event(Event{
+			Level:   InfoLevel,
+			Message: fmt.Sprintf(format, args...),
+			Time:    time.Now(),
+			Data:    self,
+		})
+	}
+}
+func (self *TagFiled) Infoln(args ...interface{}) {
+	if level >= InfoLevel {
+		event(Event{
+			Level:   InfoLevel,
+			Message: fmt.Sprintln(args...),
+			Time:    time.Now(),
+			Data:    self,
+		})
+	}
+}
+
+func (self *TagFiled) Debug(args ...interface{}) {
+	if level >= DebugLevel {
+		event(Event{
+			Level:   DebugLevel,
+			Message: fmt.Sprint(args...),
+			Time:    time.Now(),
+			Data:    self,
+		})
+	}
+}
+func (self *TagFiled) Debugf(format string, args ...interface{}) {
+	if level >= DebugLevel {
+		event(Event{
+			Level:   DebugLevel,
+			Message: fmt.Sprintf(format, args...),
+			Time:    time.Now(),
+			Data:    self,
+		})
+	}
+}
+func (self *TagFiled) Debugln(args ...interface{}) {
+	if level >= DebugLevel {
+		event(Event{
+			Level:   DebugLevel,
+			Message: fmt.Sprintln(args...),
+			Time:    time.Now(),
+			Data:    self,
+		})
+	}
+}
+
 type Level uint8
 
 const (
@@ -200,5 +357,5 @@ type Event struct {
 	Level   Level
 	Message string
 	Time    time.Time
-	Data    Filed
+	Data    interface{}
 }

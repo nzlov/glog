@@ -32,12 +32,17 @@ func a() {
 			glog.NewTagFiled("tag").
 				Set("k", "v").Infoln(i)
 			i++
-			time.Sleep(time.Millisecond)
+			time.Sleep(time.Second)
 		}
 	}()
-	time.Sleep(time.Second)
-	a1()
+	time.Sleep(time.Second * 2)
+	go a1()
+	time.Sleep(time.Second * 5)
 }
 func a1() {
-	panic("eeee")
+	if 2 > 1 {
+		glog.Panic("eeee", "dddddd")
+		// glog.NewFiled().Set("k", "v").Set("k1", "v1").Panic("a")
+		// glog.NewTagFiled("tag").Set("k", "v").Panic("a")
+	}
 }

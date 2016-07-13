@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/nzlov/glog"
-	"github.com/nzlov/glog/listener/console"
+	"github.com/nzlov/glog/listener/colorconsole"
 	"github.com/nzlov/glog/listener/file"
 )
 
@@ -16,7 +16,7 @@ func main() {
 		panic(err)
 	}
 	glog.Register(f)
-	glog.Register(console.New())
+	glog.Register(colorconsole.New(colorconsole.ShowTypeDefault))
 
 	a()
 }
@@ -24,11 +24,12 @@ func a() {
 	go func() {
 		i := 1
 		for {
-			glog.Infoln(i)
+			glog.Errorln(i)
+			glog.Debugln(i)
 			glog.NewFiled().
 				Set("k", "v").
 				Set("k1", "v1").
-				Infoln(i)
+				Warnln(i)
 			glog.NewTagFiled("tag").
 				Set("k", "v").Infoln(i)
 			i++

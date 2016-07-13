@@ -4,10 +4,14 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"sync"
 	"time"
 )
 
+var QuitWait sync.WaitGroup
+
 var MAXSTACK int = 99
+var LOGCHANSIZE int = 20
 
 var listeners map[string]Listener
 var level Level
@@ -27,6 +31,7 @@ func init() {
 func Register(l Listener) {
 	l.Start()
 	listeners[l.Name()] = l
+	QuitWait.Add(1)
 }
 func SetLevel(l Level) {
 	level = l
@@ -77,8 +82,9 @@ func Close() {
 	close(events)
 	<-done
 	for _, l := range listeners {
-		<-l.Stop()
+		l.Stop()
 	}
+	QuitWait.Wait()
 }
 
 func exit() {

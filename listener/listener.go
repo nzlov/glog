@@ -12,14 +12,12 @@ type listener interface {
 type BaseListener struct {
 	l      listener
 	notify chan glog.Event
-	quit   chan bool
 }
 
 func NewBaseListener(l listener) *BaseListener {
 	return &BaseListener{
 		l:      l,
-		notify: make(chan glog.Event, 10),
-		quit:   make(chan bool),
+		notify: make(chan glog.Event, glog.LOGCHANSIZE),
 	}
 }
 func (self *BaseListener) Notify() chan glog.Event {
@@ -35,11 +33,10 @@ func (self *BaseListener) event() {
 		self.l.Event(e)
 	}
 	self.l.Close()
-	self.quit <- true
+	glog.QuitWait.Done()
 }
-func (self *BaseListener) Stop() chan bool {
+func (self *BaseListener) Stop() {
 	close(self.notify)
-	return self.quit
 }
 
 func (self *BaseListener) Start() {

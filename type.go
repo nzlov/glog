@@ -339,36 +339,35 @@ const (
 func (level Level) String() string {
 	switch level {
 	case DebugLevel:
-		return "debug"
+		return "DEBUG"
 	case InfoLevel:
-		return "info"
+		return "INFO"
 	case WarnLevel:
-		return "warning"
+		return "WARNING"
 	case ErrorLevel:
-		return "error"
+		return "ERROR"
 	case PanicLevel:
-		return "panic"
+		return "PANIC"
 	}
 
-	return "unknown"
+	return "UNKNOWN"
 }
 
 func ParseLevel(lvl string) (Level, error) {
 	switch lvl {
-	case "panic":
+	case "PANIC":
 		return PanicLevel, nil
-	case "error":
+	case "ERROR":
 		return ErrorLevel, nil
-	case "warn", "warning":
+	case "WARNING":
 		return WarnLevel, nil
-	case "info":
+	case "INFO":
 		return InfoLevel, nil
-	case "debug":
+	case "DEBUG":
 		return DebugLevel, nil
+	default:
+		return UnknownLevel, fmt.Errorf("not a valid logrus Level: %q", lvl)
 	}
-
-	var l Level
-	return l, fmt.Errorf("not a valid logrus Level: %q", lvl)
 }
 
 type Event struct {

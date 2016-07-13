@@ -20,11 +20,10 @@ func (self Filed) Get(k string) (interface{}, bool) {
 	return v, b
 }
 func (self Filed) String() string {
-	s := "["
+	s := "\tShow Filed:\n"
 	for k, v := range self {
-		s = s + fmt.Sprintf(" %v=%+v", k, v)
+		s = s + fmt.Sprintf("\t\t%v=%+v\n", k, v)
 	}
-	s = s + " ]"
 	return s
 }
 func (self Filed) Panic(args ...interface{}) {
@@ -187,11 +186,10 @@ func (self *TagFiled) SetTag(tag string) *TagFiled {
 	return self
 }
 func (self *TagFiled) String() string {
-	s := "[" + self.tag + "]["
+	s := "\t[" + self.tag + "]Show Filed:\n"
 	for k, v := range self.value {
-		s = s + fmt.Sprintf(" %v=%+v", k, v)
+		s = s + fmt.Sprintf("\t\t%v=%+v\n", k, v)
 	}
-	s = s + " ]"
 	return s
 }
 func (self *TagFiled) Panic(args ...interface{}) {

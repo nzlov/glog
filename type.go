@@ -5,39 +5,39 @@ import (
 	"time"
 )
 
-type Filed map[string]interface{}
+type Field map[string]interface{}
 
-func NewFiled() Filed {
-	return Filed{}
+func NewField() Field {
+	return Field{}
 }
 
-func (self Filed) Set(k string, v interface{}) Filed {
+func (self Field) Set(k string, v interface{}) Field {
 	self[k] = v
 	return self
 }
-func (self Filed) Get(k string) (interface{}, bool) {
+func (self Field) Get(k string) (interface{}, bool) {
 	v, b := self[k]
 	return v, b
 }
-func (self Filed) String() string {
-	s := "\tShow Filed:\n"
+func (self Field) String() string {
+	s := "\tShow Field:\n"
 	for k, v := range self {
 		s = s + fmt.Sprintf("\t\t%v=%+v\n", k, v)
 	}
 	return s
 }
-func (self Filed) Panic(args ...interface{}) {
+func (self Field) Panic(args ...interface{}) {
 	paincf(fmt.Sprint(args...), 2, self)
 }
 
-func (self Filed) Panicf(format string, args ...interface{}) {
+func (self Field) Panicf(format string, args ...interface{}) {
 	paincf(fmt.Sprintf(format, args...), 2, self)
 }
 
-func (self Filed) Panicln(args ...interface{}) {
+func (self Field) Panicln(args ...interface{}) {
 	paincf(fmt.Sprintln(args...), 2, self)
 }
-func (self Filed) Error(args ...interface{}) {
+func (self Field) Error(args ...interface{}) {
 	if level >= ErrorLevel {
 		event(Event{
 			Level:   ErrorLevel,
@@ -47,7 +47,7 @@ func (self Filed) Error(args ...interface{}) {
 		})
 	}
 }
-func (self Filed) Errorf(format string, args ...interface{}) {
+func (self Field) Errorf(format string, args ...interface{}) {
 	if level >= ErrorLevel {
 		event(Event{
 			Level:   ErrorLevel,
@@ -57,7 +57,7 @@ func (self Filed) Errorf(format string, args ...interface{}) {
 		})
 	}
 }
-func (self Filed) Errorln(args ...interface{}) {
+func (self Field) Errorln(args ...interface{}) {
 	if level >= ErrorLevel {
 		event(Event{
 			Level:   ErrorLevel,
@@ -68,7 +68,7 @@ func (self Filed) Errorln(args ...interface{}) {
 	}
 }
 
-func (self Filed) Warn(args ...interface{}) {
+func (self Field) Warn(args ...interface{}) {
 	if level >= WarnLevel {
 		event(Event{
 			Level:   WarnLevel,
@@ -78,7 +78,7 @@ func (self Filed) Warn(args ...interface{}) {
 		})
 	}
 }
-func (self Filed) Warnf(format string, args ...interface{}) {
+func (self Field) Warnf(format string, args ...interface{}) {
 	if level >= WarnLevel {
 		event(Event{
 			Level:   WarnLevel,
@@ -88,7 +88,7 @@ func (self Filed) Warnf(format string, args ...interface{}) {
 		})
 	}
 }
-func (self Filed) Warnln(args ...interface{}) {
+func (self Field) Warnln(args ...interface{}) {
 	if level >= WarnLevel {
 		event(Event{
 			Level:   WarnLevel,
@@ -99,7 +99,7 @@ func (self Filed) Warnln(args ...interface{}) {
 	}
 }
 
-func (self Filed) Info(args ...interface{}) {
+func (self Field) Info(args ...interface{}) {
 	if level >= InfoLevel {
 		event(Event{
 			Level:   InfoLevel,
@@ -109,7 +109,7 @@ func (self Filed) Info(args ...interface{}) {
 		})
 	}
 }
-func (self Filed) Infof(format string, args ...interface{}) {
+func (self Field) Infof(format string, args ...interface{}) {
 	if level >= InfoLevel {
 		event(Event{
 			Level:   InfoLevel,
@@ -119,7 +119,7 @@ func (self Filed) Infof(format string, args ...interface{}) {
 		})
 	}
 }
-func (self Filed) Infoln(args ...interface{}) {
+func (self Field) Infoln(args ...interface{}) {
 	if level >= InfoLevel {
 		event(Event{
 			Level:   InfoLevel,
@@ -130,7 +130,7 @@ func (self Filed) Infoln(args ...interface{}) {
 	}
 }
 
-func (self Filed) Debug(args ...interface{}) {
+func (self Field) Debug(args ...interface{}) {
 	if level >= DebugLevel {
 		event(Event{
 			Level:   DebugLevel,
@@ -140,7 +140,7 @@ func (self Filed) Debug(args ...interface{}) {
 		})
 	}
 }
-func (self Filed) Debugf(format string, args ...interface{}) {
+func (self Field) Debugf(format string, args ...interface{}) {
 	if level >= DebugLevel {
 		event(Event{
 			Level:   DebugLevel,
@@ -150,7 +150,7 @@ func (self Filed) Debugf(format string, args ...interface{}) {
 		})
 	}
 }
-func (self Filed) Debugln(args ...interface{}) {
+func (self Field) Debugln(args ...interface{}) {
 	if level >= DebugLevel {
 		event(Event{
 			Level:   DebugLevel,
@@ -161,47 +161,47 @@ func (self Filed) Debugln(args ...interface{}) {
 	}
 }
 
-type TagFiled struct {
+type TagField struct {
 	tag   string
 	value map[string]interface{}
 }
 
-func NewTagFiled(tag string) *TagFiled {
-	return &TagFiled{tag: tag, value: make(map[string]interface{})}
+func NewTagField(tag string) *TagField {
+	return &TagField{tag: tag, value: make(map[string]interface{})}
 }
 
-func (self *TagFiled) Set(k string, v interface{}) *TagFiled {
+func (self *TagField) Set(k string, v interface{}) *TagField {
 	self.value[k] = v
 	return self
 }
-func (self *TagFiled) Get(k string) (interface{}, bool) {
+func (self *TagField) Get(k string) (interface{}, bool) {
 	v, b := self.value[k]
 	return v, b
 }
-func (self *TagFiled) GetTag() string {
+func (self *TagField) GetTag() string {
 	return self.tag
 }
-func (self *TagFiled) SetTag(tag string) *TagFiled {
+func (self *TagField) SetTag(tag string) *TagField {
 	self.tag = tag
 	return self
 }
-func (self *TagFiled) String() string {
-	s := "\t[" + self.tag + "]Show Filed:\n"
+func (self *TagField) String() string {
+	s := "\t[" + self.tag + "]Show Field:\n"
 	for k, v := range self.value {
 		s = s + fmt.Sprintf("\t\t%v=%+v\n", k, v)
 	}
 	return s
 }
-func (self *TagFiled) Panic(args ...interface{}) {
+func (self *TagField) Panic(args ...interface{}) {
 	paincf(fmt.Sprint(args...), 2, self)
 }
-func (self *TagFiled) Panicf(format string, args ...interface{}) {
+func (self *TagField) Panicf(format string, args ...interface{}) {
 	paincf(fmt.Sprintf(format, args...), 2, self)
 }
-func (self *TagFiled) Panicln(args ...interface{}) {
+func (self *TagField) Panicln(args ...interface{}) {
 	paincf(fmt.Sprintln(args...), 2, self)
 }
-func (self *TagFiled) Error(args ...interface{}) {
+func (self *TagField) Error(args ...interface{}) {
 	if level >= ErrorLevel {
 		event(Event{
 			Level:   ErrorLevel,
@@ -211,7 +211,7 @@ func (self *TagFiled) Error(args ...interface{}) {
 		})
 	}
 }
-func (self *TagFiled) Errorf(format string, args ...interface{}) {
+func (self *TagField) Errorf(format string, args ...interface{}) {
 	if level >= ErrorLevel {
 		event(Event{
 			Level:   ErrorLevel,
@@ -221,7 +221,7 @@ func (self *TagFiled) Errorf(format string, args ...interface{}) {
 		})
 	}
 }
-func (self *TagFiled) Errorln(args ...interface{}) {
+func (self *TagField) Errorln(args ...interface{}) {
 	if level >= ErrorLevel {
 		event(Event{
 			Level:   ErrorLevel,
@@ -232,7 +232,7 @@ func (self *TagFiled) Errorln(args ...interface{}) {
 	}
 }
 
-func (self *TagFiled) Warn(args ...interface{}) {
+func (self *TagField) Warn(args ...interface{}) {
 	if level >= WarnLevel {
 		event(Event{
 			Level:   WarnLevel,
@@ -242,7 +242,7 @@ func (self *TagFiled) Warn(args ...interface{}) {
 		})
 	}
 }
-func (self *TagFiled) Warnf(format string, args ...interface{}) {
+func (self *TagField) Warnf(format string, args ...interface{}) {
 	if level >= WarnLevel {
 		event(Event{
 			Level:   WarnLevel,
@@ -252,7 +252,7 @@ func (self *TagFiled) Warnf(format string, args ...interface{}) {
 		})
 	}
 }
-func (self *TagFiled) Warnln(args ...interface{}) {
+func (self *TagField) Warnln(args ...interface{}) {
 	if level >= WarnLevel {
 		event(Event{
 			Level:   WarnLevel,
@@ -263,7 +263,7 @@ func (self *TagFiled) Warnln(args ...interface{}) {
 	}
 }
 
-func (self *TagFiled) Info(args ...interface{}) {
+func (self *TagField) Info(args ...interface{}) {
 	if level >= InfoLevel {
 		event(Event{
 			Level:   InfoLevel,
@@ -273,7 +273,7 @@ func (self *TagFiled) Info(args ...interface{}) {
 		})
 	}
 }
-func (self *TagFiled) Infof(format string, args ...interface{}) {
+func (self *TagField) Infof(format string, args ...interface{}) {
 	if level >= InfoLevel {
 		event(Event{
 			Level:   InfoLevel,
@@ -283,7 +283,7 @@ func (self *TagFiled) Infof(format string, args ...interface{}) {
 		})
 	}
 }
-func (self *TagFiled) Infoln(args ...interface{}) {
+func (self *TagField) Infoln(args ...interface{}) {
 	if level >= InfoLevel {
 		event(Event{
 			Level:   InfoLevel,
@@ -294,7 +294,7 @@ func (self *TagFiled) Infoln(args ...interface{}) {
 	}
 }
 
-func (self *TagFiled) Debug(args ...interface{}) {
+func (self *TagField) Debug(args ...interface{}) {
 	if level >= DebugLevel {
 		event(Event{
 			Level:   DebugLevel,
@@ -304,7 +304,7 @@ func (self *TagFiled) Debug(args ...interface{}) {
 		})
 	}
 }
-func (self *TagFiled) Debugf(format string, args ...interface{}) {
+func (self *TagField) Debugf(format string, args ...interface{}) {
 	if level >= DebugLevel {
 		event(Event{
 			Level:   DebugLevel,
@@ -314,7 +314,7 @@ func (self *TagFiled) Debugf(format string, args ...interface{}) {
 		})
 	}
 }
-func (self *TagFiled) Debugln(args ...interface{}) {
+func (self *TagField) Debugln(args ...interface{}) {
 	if level >= DebugLevel {
 		event(Event{
 			Level:   DebugLevel,

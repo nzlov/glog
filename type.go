@@ -27,6 +27,17 @@ func (self Filed) String() string {
 	s = s + " ]"
 	return s
 }
+func (self Filed) Panic(args ...interface{}) {
+	paincf(fmt.Sprint(args...), 2, self)
+}
+
+func (self Filed) Panicf(format string, args ...interface{}) {
+	paincf(fmt.Sprintf(format, args...), 2, self)
+}
+
+func (self Filed) Panicln(args ...interface{}) {
+	paincf(fmt.Sprintln(args...), 2, self)
+}
 func (self Filed) Error(args ...interface{}) {
 	if level >= ErrorLevel {
 		event(Event{
@@ -182,6 +193,15 @@ func (self *TagFiled) String() string {
 	}
 	s = s + " ]"
 	return s
+}
+func (self *TagFiled) Panic(args ...interface{}) {
+	paincf(fmt.Sprint(args...), 2, self)
+}
+func (self *TagFiled) Panicf(format string, args ...interface{}) {
+	paincf(fmt.Sprintf(format, args...), 2, self)
+}
+func (self *TagFiled) Panicln(args ...interface{}) {
+	paincf(fmt.Sprintln(args...), 2, self)
 }
 func (self *TagFiled) Error(args ...interface{}) {
 	if level >= ErrorLevel {

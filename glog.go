@@ -2,6 +2,7 @@ package glog
 
 import (
 	"fmt"
+	"os"
 	"runtime"
 	"time"
 )
@@ -78,6 +79,41 @@ func Close() {
 	for _, l := range listeners {
 		<-l.Stop()
 	}
+}
+
+func exit() {
+	Close()
+	os.Exit(1)
+}
+
+func Panic(args ...interface{}) {
+	paincf(fmt.Sprint(args...), 2, nil)
+}
+func Panicf(format string, args ...interface{}) {
+	paincf(fmt.Sprint(args...), 2, nil)
+}
+
+func Panicln(args ...interface{}) {
+	paincf(fmt.Sprint(args...), 2, nil)
+}
+func paincf(s string, c int, data interface{}) {
+	errstr := fmt.Sprintf("Runtime error:%v\nTraceback:\n", s)
+	i := c
+	for {
+		pc, file, line, ok := runtime.Caller(i)
+		if !ok || i > MAXSTACK {
+			break
+		}
+		errstr += fmt.Sprintf("\tstack: %d [file:%s][line:%d][func:%s]\n", i-c, file, line, runtime.FuncForPC(pc).Name())
+		i++
+	}
+	event(Event{
+		Level:   PanicLevel,
+		Message: errstr,
+		Time:    time.Now(),
+		Data:    data,
+	})
+	exit()
 }
 
 func Error(args ...interface{}) {

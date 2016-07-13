@@ -22,7 +22,7 @@ func (self Filed) Get(k string) (interface{}, bool) {
 func (self Filed) String() string {
 	s := "["
 	for k, v := range self {
-		s = s + fmt.Sprintf(" %s=%s", k, v)
+		s = s + fmt.Sprintf(" %v=%+v", k, v)
 	}
 	s = s + " ]"
 	return s
@@ -189,7 +189,7 @@ func (self *TagFiled) SetTag(tag string) *TagFiled {
 func (self *TagFiled) String() string {
 	s := "[" + self.tag + "]["
 	for k, v := range self.value {
-		s = s + fmt.Sprintf(" %s=%s", k, v)
+		s = s + fmt.Sprintf(" %v=%+v", k, v)
 	}
 	s = s + " ]"
 	return s

@@ -3,6 +3,8 @@ package main
 import (
 	"time"
 
+	"fmt"
+
 	"github.com/nzlov/glog"
 	"github.com/nzlov/glog/listener/colorconsole"
 	"github.com/nzlov/glog/listener/file"
@@ -26,24 +28,20 @@ func a() {
 		for {
 			glog.Errorln(i)
 			glog.Debugln(i)
-			glog.NewFiled().
+			glog.NewField().
 				Set("k", "v").
 				Set("k1", "v1").
 				Warnln(i)
-			glog.NewTagFiled("tag").
+			glog.NewTagField("tag").
 				Set("k", "v").Infoln(i)
 			i++
 			time.Sleep(time.Second)
 		}
 	}()
 	time.Sleep(time.Second * 2)
-	go a1()
+	go glog.Go(a1, 1, 0)
 	time.Sleep(time.Second * 5)
 }
-func a1() {
-	if 2 > 1 {
-		glog.Panic("eeee", "dddddd")
-		// glog.NewFiled().Set("k", "v").Set("k1", "v1").Panic("a")
-		// glog.NewTagFiled("tag").Set("k", "v").Panic("a")
-	}
+func a1(x, y int) {
+	fmt.Printf("%d / %d = %d\n", x, y, x/y)
 }

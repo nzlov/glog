@@ -3,6 +3,7 @@ package glog
 import (
 	"fmt"
 	"os"
+	"reflect"
 	"runtime"
 	"sync"
 	"time"
@@ -96,11 +97,11 @@ func Panic(args ...interface{}) {
 	paincf(fmt.Sprint(args...), 2, nil)
 }
 func Panicf(format string, args ...interface{}) {
-	paincf(fmt.Sprint(args...), 2, nil)
+	paincf(fmt.Sprintf(format, args...), 2, nil)
 }
 
 func Panicln(args ...interface{}) {
-	paincf(fmt.Sprint(args...), 2, nil)
+	paincf(fmt.Sprintln(args...), 2, nil)
 }
 func paincf(s string, c int, data interface{}) {
 	errstr := fmt.Sprintf("Runtime error:%v\nTraceback:\n", s)
@@ -120,6 +121,50 @@ func paincf(s string, c int, data interface{}) {
 		Data:    data,
 	})
 	exit()
+}
+
+func Go(f interface{}, params ...interface{}) {
+	fv := reflect.ValueOf(f)
+	ft := reflect.TypeOf(f)
+	if fv.Kind() == reflect.Func {
+		if ft.NumIn() == len(params) {
+			in := make([]reflect.Value, len(params))
+			for i, p := range params {
+				pv := reflect.ValueOf(p)
+				if pv.Kind() == ft.In(i).Kind() {
+					in[i] = pv
+				} else {
+					Panicf("params[%d] type %v don't is Func params[%d] type %v\n", i, pv.Kind(), i, ft.In(i).Kind())
+				}
+			}
+			defer func() {
+				if err := recover(); err != nil {
+					errstr := fmt.Sprintf("Runtime error:%v\ntraceback:\n", err)
+					i := 3
+					for {
+						pc, file, line, ok := runtime.Caller(i)
+						if !ok || i > MAXSTACK {
+							break
+						}
+						errstr += fmt.Sprintf("\tstack: %d %v [file:%s][line:%d][func:%s]\n", i-2, ok, file, line, runtime.FuncForPC(pc).Name())
+						i++
+					}
+					event(Event{
+						Level:   PanicLevel,
+						Message: errstr,
+						Time:    time.Now(),
+						Data:    nil,
+					})
+					exit()
+				}
+			}()
+			fv.Call(in)
+		} else {
+			Panicln("params len don't == Func params")
+		}
+	} else {
+		Panicln("f don't is Func")
+	}
 }
 
 func Error(args ...interface{}) {

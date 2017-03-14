@@ -8,6 +8,7 @@ import (
 	"github.com/nzlov/glog"
 	"github.com/nzlov/glog/listener/colorconsole"
 	"github.com/nzlov/glog/listener/file"
+	"github.com/nzlov/glog/listener/hprose"
 )
 
 func main() {
@@ -19,6 +20,7 @@ func main() {
 	}
 	glog.Register(f)
 	glog.Register(colorconsole.New(colorconsole.ShowTypeDefault))
+	glog.Register(hprose.New("tcp://127.0.0.1:8888"))
 
 	a()
 }

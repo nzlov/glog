@@ -1,0 +1,18 @@
+[ERROR][2017-03-14 22:38:21] 1
+[DEBUG][2017-03-14 22:38:21] 1
+[WARNING][2017-03-14 22:38:21] 1
+	Show Field:
+		k=v
+		k1=v1
+[INFO][2017-03-14 22:38:21] 1
+	[tag]Show Field:
+		k=v
+[PANIC][2017-03-14 22:38:23] Runtime error:runtime error: integer divide by zero
+traceback:
+	stack: 1 true [file:/Users/qipeng/program/go/src/runtime/panic.go][line:42][func:runtime.panicdivide]
+	stack: 2 true [file:/Users/qipeng/workspace/go/src/github.com/nzlov/glog/example/t1.go][line:45][func:main.a1]
+	stack: 3 true [file:/Users/qipeng/program/go/src/runtime/asm_amd64.s][line:514][func:runtime.call32]
+	stack: 4 true [file:/Users/qipeng/program/go/src/reflect/value.go][line:434][func:reflect.Value.call]
+	stack: 5 true [file:/Users/qipeng/program/go/src/reflect/value.go][line:302][func:reflect.Value.Call]
+	stack: 6 true [file:/Users/qipeng/workspace/go/src/github.com/nzlov/glog/glog.go][line:161][func:github.com/nzlov/glog.Go]
+	stack: 7 true [file:/Users/qipeng/program/go/src/runtime/asm_amd64.s][line:2197][func:runtime.goexit]

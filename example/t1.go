@@ -24,8 +24,7 @@ func main() {
 }
 func a() {
 	go func() {
-		i := 1
-		for {
+		for i := 1; i < 3; i++ {
 			glog.Errorln(i)
 			glog.Debugln(i)
 			glog.NewField().
@@ -44,4 +43,5 @@ func a() {
 }
 func a1(x, y int) {
 	fmt.Printf("%d / %d = %d\n", x, y, x/y)
+	panic(fmt.Errorf("E\n"))
 }

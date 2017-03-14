@@ -25,11 +25,7 @@ func (self *BaseListener) Notify() chan glog.Event {
 }
 
 func (self *BaseListener) event() {
-	for {
-		e, ok := <-self.notify
-		if !ok {
-			break
-		}
+	for e := range self.notify {
 		self.l.Event(e)
 	}
 	self.l.Close()

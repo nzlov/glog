@@ -23,7 +23,7 @@ var done chan bool
 func init() {
 	listeners = make(map[string]Listener)
 	level = InfoLevel
-	events = make(chan Event, MAXSTACK)
+	events = make(chan Event, LOGCHANSIZE)
 	done = make(chan bool)
 	isRunning = true
 	go le()
@@ -45,11 +45,7 @@ func event(e Event) {
 }
 
 func le() {
-	for {
-		e, ok := <-events
-		if !ok {
-			break
-		}
+	for e := range events {
 		for _, l := range listeners {
 			l.Notify() <- e
 		}

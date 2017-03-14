@@ -43,5 +43,4 @@ func a() {
 }
 func a1(x, y int) {
 	fmt.Printf("%d / %d = %d\n", x, y, x/y)
-	panic(fmt.Errorf("E\n"))
 }

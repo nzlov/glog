@@ -353,20 +353,20 @@ func (level Level) String() string {
 	return "UNKNOWN"
 }
 
-func ParseLevel(lvl string) (Level, error) {
+func ParseLevel(lvl string) Level {
 	switch lvl {
-	case "PANIC":
-		return PanicLevel, nil
-	case "ERROR":
-		return ErrorLevel, nil
-	case "WARNING":
-		return WarnLevel, nil
-	case "INFO":
-		return InfoLevel, nil
-	case "DEBUG":
-		return DebugLevel, nil
+	case "PANIC", "panic":
+		return PanicLevel
+	case "ERROR", "error":
+		return ErrorLevel
+	case "WARNING", "warning":
+		return WarnLevel
+	case "INFO", "info":
+		return InfoLevel
+	case "DEBUG", "debug":
+		return DebugLevel
 	default:
-		return UnknownLevel, fmt.Errorf("not a valid logrus Level: %q", lvl)
+		return UnknownLevel
 	}
 }
 

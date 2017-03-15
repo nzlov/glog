@@ -34,6 +34,7 @@ func Register(l Listener) {
 	listeners[l.Name()] = l
 	QuitWait.Add(1)
 }
+
 func SetLevel(l Level) {
 	level = l
 }

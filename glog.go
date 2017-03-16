@@ -243,7 +243,7 @@ func Info(args ...interface{}) {
 func Infof(format string, args ...interface{}) {
 	if level >= InfoLevel {
 		event(Event{
-			Level:   level,
+			Level:   InfoLevel,
 			Message: fmt.Sprintf(format, args...),
 			Time:    time.Now(),
 			Data:    nil,
@@ -264,7 +264,7 @@ func Infoln(args ...interface{}) {
 func Debug(args ...interface{}) {
 	if level >= DebugLevel {
 		event(Event{
-			Level:   level,
+			Level:   DebugLevel,
 			Message: fmt.Sprint(args...),
 			Time:    time.Now(),
 			Data:    nil,
@@ -274,7 +274,7 @@ func Debug(args ...interface{}) {
 func Debugf(format string, args ...interface{}) {
 	if level >= DebugLevel {
 		event(Event{
-			Level:   level,
+			Level:   DebugLevel,
 			Message: fmt.Sprintf(format, args...),
 			Time:    time.Now(),
 			Data:    nil,
@@ -284,7 +284,7 @@ func Debugf(format string, args ...interface{}) {
 func Debugln(args ...interface{}) {
 	if level >= DebugLevel {
 		event(Event{
-			Level:   level,
+			Level:   DebugLevel,
 			Message: fmt.Sprintln(args...),
 			Time:    time.Now(),
 			Data:    nil,

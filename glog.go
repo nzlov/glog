@@ -64,13 +64,13 @@ func Close() {
 	}
 	if err := recover(); err != nil {
 		errstr := fmt.Sprintf("Runtime error:%v\ntraceback:\n", err)
-		i := 3
+		i := 4
 		for {
 			pc, file, line, ok := runtime.Caller(i)
 			if !ok || i > MAXSTACK {
 				break
 			}
-			errstr += fmt.Sprintf("\tstack: %d %v [file:%s][line:%d][func:%s]\n", i-2, ok, file, line, runtime.FuncForPC(pc).Name())
+			errstr += fmt.Sprintf("\tstack: %d %v [file:%s][line:%d][func:%s]\n", i-3, ok, file, line, runtime.FuncForPC(pc).Name())
 			i++
 		}
 		event(Event{
@@ -112,7 +112,7 @@ func paincf(s string, c int, data interface{}) {
 		if !ok || i > MAXSTACK {
 			break
 		}
-		errstr += fmt.Sprintf("\tstack: %d [file:%s][line:%d][func:%s]\n", i-c, file, line, runtime.FuncForPC(pc).Name())
+		errstr += fmt.Sprintf("\tstack: %d [file:%s][line:%d][func:%s]\n", i-c+1, file, line, runtime.FuncForPC(pc).Name())
 		i++
 	}
 	event(Event{
@@ -141,13 +141,13 @@ func Go(f interface{}, params ...interface{}) {
 			defer func() {
 				if err := recover(); err != nil {
 					errstr := fmt.Sprintf("Runtime error:%v\ntraceback:\n", err)
-					i := 3
+					i := 4
 					for {
 						pc, file, line, ok := runtime.Caller(i)
 						if !ok || i > MAXSTACK {
 							break
 						}
-						errstr += fmt.Sprintf("\tstack: %d %v [file:%s][line:%d][func:%s]\n", i-2, ok, file, line, runtime.FuncForPC(pc).Name())
+						errstr += fmt.Sprintf("\tstack: %d %v [file:%s][line:%d][func:%s]\n", i-3, ok, file, line, runtime.FuncForPC(pc).Name())
 						i++
 					}
 					event(Event{

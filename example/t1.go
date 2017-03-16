@@ -3,8 +3,6 @@ package main
 import (
 	"time"
 
-	"fmt"
-
 	"github.com/nzlov/glog"
 	"github.com/nzlov/glog/listener/colorconsole"
 	"github.com/nzlov/glog/listener/file"
@@ -38,9 +36,10 @@ func a() {
 		}
 	}()
 	time.Sleep(time.Second * 2)
-	// go glog.Go(a1, 1, 0)
+	go glog.Go(a1, 1, 0)
 	time.Sleep(time.Second * 5)
 }
 func a1(x, y int) {
-	fmt.Printf("%d / %d = %d\n", x, y, x/y)
+	//	fmt.Printf("%d / %d = %d\n", x, y, x/y)
+	glog.Panicln("ooo")
 }

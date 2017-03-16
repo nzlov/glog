@@ -5,6 +5,7 @@ import (
 	"os"
 	"reflect"
 	"runtime"
+	"strings"
 	"sync"
 	"time"
 )
@@ -41,6 +42,9 @@ func SetLevel(l Level) {
 
 func event(e Event) {
 	if isRunning {
+		if level >= DebugLevel {
+			e.FuncCall = getCaller(3)
+		}
 		events <- e
 	}
 }
@@ -285,5 +289,20 @@ func Debugln(args ...interface{}) {
 			Time:    time.Now(),
 			Data:    nil,
 		})
+	}
+}
+
+func getCaller(i int) *FuncCall {
+	pc, file, line, ok := runtime.Caller(i)
+	if !ok {
+		return nil
+	}
+	fs := strings.Split(file, "/")
+	// fcs := strings.Split(runtime.FuncForPC(pc).Name(), ".")
+	return &FuncCall{
+		File: fs[len(fs)-2] + "/" + fs[len(fs)-1],
+		Line: line,
+		// Func: fcs[len(fcs)-1],
+		Func: runtime.FuncForPC(pc).Name(),
 	}
 }

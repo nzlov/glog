@@ -21,10 +21,12 @@ func (self *Console) Name() string {
 }
 
 func (self *Console) Event(e glog.Event) {
-	if e.Data == nil {
-		fmt.Printf("[%s][%s] %s", e.Level, e.Time.Format("2006-01-02 15:04:05"), e.Message)
+	if e.FuncCall != nil {
+		fmt.Printf("[%s][%s]%s %s", e.Level, e.Time.Format("2006-01-02 15:04:05"), e.FuncCall, e.Message)
 	} else {
 		fmt.Printf("[%s][%s] %s", e.Level, e.Time.Format("2006-01-02 15:04:05"), e.Message)
+	}
+	if e.Data != nil {
 		fmt.Printf("%s", e.Data)
 	}
 }

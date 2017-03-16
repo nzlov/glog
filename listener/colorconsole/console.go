@@ -63,7 +63,11 @@ func (self *ColorConsole) typefg(e glog.Event) {
 	case glog.InfoLevel:
 		self.cl = InfoLevelColor
 	}
-	self.cl.Printf("[%s][%s] %s", e.Level, e.Time.Format("2006-01-02 15:04:05"), e.Message)
+	if e.FuncCall != nil {
+		self.cl.Printf("[%s][%s]%s %s", e.Level, e.Time.Format("2006-01-02 15:04:05"), e.FuncCall, e.Message)
+	} else {
+		self.cl.Printf("[%s][%s] %s", e.Level, e.Time.Format("2006-01-02 15:04:05"), e.Message)
+	}
 	if e.Data != nil {
 		self.cl.Printf("%s", e.Data)
 	}
@@ -84,7 +88,11 @@ func (self *ColorConsole) typedef(e glog.Event) {
 		InfoLevelColor.Print(e.Level)
 	}
 	fmt.Print("]")
-	fmt.Printf("[%s] %s", e.Time.Format("2006-01-02 15:04:05"), e.Message)
+	if e.FuncCall != nil {
+		fmt.Printf("[%s]%s %s", e.Time.Format("2006-01-02 15:04:05"), e.FuncCall, e.Message)
+	} else {
+		fmt.Printf("[%s] %s", e.Time.Format("2006-01-02 15:04:05"), e.Message)
+	}
 	if e.Data != nil {
 		fmt.Printf("%s", e.Data)
 	}

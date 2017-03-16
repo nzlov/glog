@@ -33,11 +33,12 @@ func (self *File) Name() string {
 }
 
 func (self *File) Event(e glog.Event) {
-	if e.Data == nil {
-		fmt.Fprintf(self.f, "[%s][%s] %s", e.Level, e.Time.Format("2006-01-02 15:04:05"), e.Message)
-
+	if e.FuncCall != nil {
+		fmt.Fprintf(self.f, "[%s][%s]%s %s", e.Level, e.Time.Format("2006-01-02 15:04:05"), e.FuncCall, e.Message)
 	} else {
 		fmt.Fprintf(self.f, "[%s][%s] %s", e.Level, e.Time.Format("2006-01-02 15:04:05"), e.Message)
+	}
+	if e.Data != nil {
 		fmt.Fprintf(self.f, "%s", e.Data)
 	}
 }

@@ -371,8 +371,20 @@ func ParseLevel(lvl string) Level {
 }
 
 type Event struct {
-	Level   Level
-	Message string
-	Time    time.Time
-	Data    interface{}
+	Level    Level
+	Message  string
+	Time     time.Time
+	Data     interface{}
+	FuncCall *FuncCall
+}
+
+type FuncCall struct {
+	File string
+	Line int
+	Func string
+}
+
+func (fc FuncCall) String() string {
+
+	return fmt.Sprintf("[%s:%d][%s]", fc.File, fc.Line, fc.Func)
 }

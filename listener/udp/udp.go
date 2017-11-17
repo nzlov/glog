@@ -17,6 +17,9 @@ type Udp struct {
 }
 
 func New(host string) (*Udp, error) {
+	return NewWithOption(host, glog.DefaultOption)
+}
+func NewWithOption(host string, o *glog.Option) (*Udp, error) {
 	addr, err := net.ResolveUDPAddr("udp4", host)
 	if err != nil {
 		return nil, err
@@ -29,13 +32,10 @@ func New(host string) (*Udp, error) {
 		host: host,
 		udp:  udp,
 	}
-	u.BaseListener = listener.NewBaseListener(u)
+	u.BaseListener = listener.NewBaseListener(u, o)
 	return u, nil
 }
 
-func (self *Udp) Name() string {
-	return "udp:" + self.host
-}
 func (self *Udp) Event(e glog.Event) {
 	b, err := json.Marshal(e)
 	if err != nil {

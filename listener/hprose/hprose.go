@@ -20,6 +20,9 @@ type Hprose struct {
 }
 
 func New(host string) *Hprose {
+	return NewWithOption(host, glog.DefaultOption)
+}
+func NewWithOption(host string, o *glog.Option) *Hprose {
 	c := rpc.NewClient(host)
 	l := &Log{}
 	c.UseService(l)
@@ -28,13 +31,10 @@ func New(host string) *Hprose {
 		client: c,
 		log:    l,
 	}
-	u.BaseListener = listener.NewBaseListener(u)
+	u.BaseListener = listener.NewBaseListener(u, o)
 	return u
 }
 
-func (self *Hprose) Name() string {
-	return "hprose:" + self.host
-}
 func (self *Hprose) Event(e glog.Event) {
 	self.log.Log(e)
 }

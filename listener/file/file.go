@@ -16,6 +16,9 @@ type File struct {
 }
 
 func New(name string) (*File, error) {
+	return NewWithOption(name, glog.DefaultOption)
+}
+func NewWithOption(name string, o *glog.Option) (*File, error) {
 	f := &File{
 		name: name,
 	}
@@ -24,12 +27,8 @@ func New(name string) (*File, error) {
 	if err != nil {
 		return nil, err
 	}
-	f.BaseListener = listener.NewBaseListener(f)
+	f.BaseListener = listener.NewBaseListener(f, o)
 	return f, nil
-}
-
-func (self *File) Name() string {
-	return self.name
 }
 
 func (self *File) Event(e glog.Event) {

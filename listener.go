@@ -1,8 +1,10 @@
 package glog
 
 type Listener interface {
-	Name() string
+	ID() string
 	Notify() chan Event
 	Start()
+	Pause(bool)
 	Stop()
+	Option() Option
 }

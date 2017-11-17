@@ -31,14 +31,15 @@ type ColorConsole struct {
 }
 
 func New(s ShowType) *ColorConsole {
+	return NewWithOption(s, glog.DefaultOption)
+}
+
+func NewWithOption(s ShowType, o *glog.Option) *ColorConsole {
 	c := &ColorConsole{
 		ty: s,
 	}
-	c.BaseListener = listener.NewBaseListener(c)
+	c.BaseListener = listener.NewBaseListener(c, o)
 	return c
-}
-func (self *ColorConsole) Name() string {
-	return "ColorConsole"
 }
 
 func (self *ColorConsole) Event(e glog.Event) {
@@ -52,15 +53,13 @@ func (self *ColorConsole) Event(e glog.Event) {
 
 func (self *ColorConsole) typefg(e glog.Event) {
 	switch e.Level {
-	case glog.PanicLevel:
+	case glog.LEVELPANIC:
 		self.cl = PanicLevelColor
-	case glog.ErrorLevel:
+	case glog.LEVELERROR:
 		self.cl = ErrorLevelColor
-	case glog.DebugLevel:
-		self.cl = DebugLevelColor
-	case glog.WarnLevel:
+	case glog.LEVELWARN:
 		self.cl = WarnLevelColor
-	case glog.InfoLevel:
+	case glog.LEVELINFO:
 		self.cl = InfoLevelColor
 	}
 	if e.FuncCall != nil {
@@ -76,15 +75,13 @@ func (self *ColorConsole) typefg(e glog.Event) {
 func (self *ColorConsole) typedef(e glog.Event) {
 	fmt.Print("[")
 	switch e.Level {
-	case glog.PanicLevel:
+	case glog.LEVELPANIC:
 		PanicLevelColor.Print(e.Level)
-	case glog.ErrorLevel:
+	case glog.LEVELERROR:
 		ErrorLevelColor.Print(e.Level)
-	case glog.DebugLevel:
-		DebugLevelColor.Print(e.Level)
-	case glog.WarnLevel:
+	case glog.LEVELWARN:
 		WarnLevelColor.Print(e.Level)
-	case glog.InfoLevel:
+	case glog.LEVELINFO:
 		InfoLevelColor.Print(e.Level)
 	}
 	fmt.Print("]")

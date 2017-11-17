@@ -21,6 +21,9 @@ type Email struct {
 }
 
 func New(l glog.Level, smtp string, port int, user, pwd, from string, to []string, title string) (*Email, error) {
+	return NewWithOption(l, smtp, port, user, pwd, from, to, title, glog.DefaultOption)
+}
+func NewWithOption(l glog.Level, smtp string, port int, user, pwd, from string, to []string, title string, o *glog.Option) (*Email, error) {
 
 	mail := gomail.NewDialer(smtp, port, user, pwd)
 	_, err := mail.Dial()
@@ -29,16 +32,13 @@ func New(l glog.Level, smtp string, port int, user, pwd, from string, to []strin
 	}
 
 	c := &Email{}
-	c.BaseListener = listener.NewBaseListener(c)
+	c.BaseListener = listener.NewBaseListener(c, o)
 	c.l = l
 	c.mail = mail
 	c.from = from
 	c.to = to
 	c.title = title
 	return c, nil
-}
-func (self *Email) Name() string {
-	return "Email"
 }
 
 func (self *Email) Event(e glog.Event) {

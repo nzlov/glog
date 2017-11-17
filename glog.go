@@ -6,291 +6,22 @@ import (
 	"reflect"
 	"runtime"
 	"strings"
-	"sync"
 	"time"
 )
 
-var QuitWait sync.WaitGroup
-
-var MAXSTACK int = 99
-var LOGCHANSIZE int = 20
-
-var listeners map[string]Listener
-var level Level
-var events chan Event
-var isRunning bool
-var done chan bool
-
-func init() {
-	listeners = make(map[string]Listener)
-	level = InfoLevel
-	events = make(chan Event, LOGCHANSIZE)
-	done = make(chan bool)
-	isRunning = true
-	go le()
+var DefaultOption = &Option{
+	NumCache: 20,
+	NumStack: 99,
+	Level:    LEVELALL,
 }
 
-func Register(l Listener) {
-	l.Start()
-	listeners[l.Name()] = l
-	QuitWait.Add(1)
-}
-
-func SetLevel(l Level) {
-	level = l
-}
-
-func event(e Event) {
-	if isRunning {
-		if level >= DebugLevel {
-			e.FuncCall = getCaller(3)
-		}
-		events <- e
-	}
-}
-
-func le() {
-	for e := range events {
-		for _, l := range listeners {
-			l.Notify() <- e
-		}
-	}
-	done <- true
-}
-
-func Close() {
-	if !isRunning {
-		return
-	}
-	if err := recover(); err != nil {
-		errstr := fmt.Sprintf("Runtime error:%v\ntraceback:\n", err)
-		i := 4
-		for {
-			pc, file, line, ok := runtime.Caller(i)
-			if !ok || i > MAXSTACK {
-				break
-			}
-			errstr += fmt.Sprintf("\tstack: %d %v [file:%s][line:%d][func:%s]\n", i-3, ok, file, line, runtime.FuncForPC(pc).Name())
-			i++
-		}
-		event(Event{
-			Level:   PanicLevel,
-			Message: errstr,
-			Time:    time.Now(),
-			Data:    nil,
-		})
-	}
-	isRunning = false
-	close(events)
-	<-done
-	for _, l := range listeners {
-		l.Stop()
-	}
-	QuitWait.Wait()
-}
-
-func exit() {
+type logger interface {
 	Close()
-	os.Exit(1)
+	Event(Event)
+	Option() *Option
 }
 
-func Panic(args ...interface{}) {
-	paincf(fmt.Sprint(args...), 2, nil)
-}
-func Panicf(format string, args ...interface{}) {
-	paincf(fmt.Sprintf(format, args...), 2, nil)
-}
-
-func Panicln(args ...interface{}) {
-	paincf(fmt.Sprintln(args...), 2, nil)
-}
-func paincf(s string, c int, data interface{}) {
-	errstr := fmt.Sprintf("Runtime error:%v\nTraceback:\n", s)
-	i := c
-	for {
-		pc, file, line, ok := runtime.Caller(i)
-		if !ok || i > MAXSTACK {
-			break
-		}
-		errstr += fmt.Sprintf("\tstack: %d [file:%s][line:%d][func:%s]\n", i-c+1, file, line, runtime.FuncForPC(pc).Name())
-		i++
-	}
-	event(Event{
-		Level:   PanicLevel,
-		Message: errstr,
-		Time:    time.Now(),
-		Data:    data,
-	})
-	exit()
-}
-
-func Go(f interface{}, params ...interface{}) {
-	fv := reflect.ValueOf(f)
-	ft := reflect.TypeOf(f)
-	if fv.Kind() == reflect.Func {
-		if ft.NumIn() == len(params) {
-			in := make([]reflect.Value, len(params))
-			for i, p := range params {
-				pv := reflect.ValueOf(p)
-				if pv.Kind() == ft.In(i).Kind() {
-					in[i] = pv
-				} else {
-					Panicf("params[%d] type %v don't is Func params[%d] type %v\n", i, pv.Kind(), i, ft.In(i).Kind())
-				}
-			}
-			defer func() {
-				if err := recover(); err != nil {
-					errstr := fmt.Sprintf("Runtime error:%v\ntraceback:\n", err)
-					i := 4
-					for {
-						pc, file, line, ok := runtime.Caller(i)
-						if !ok || i > MAXSTACK {
-							break
-						}
-						errstr += fmt.Sprintf("\tstack: %d %v [file:%s][line:%d][func:%s]\n", i-3, ok, file, line, runtime.FuncForPC(pc).Name())
-						i++
-					}
-					event(Event{
-						Level:   PanicLevel,
-						Message: errstr,
-						Time:    time.Now(),
-						Data:    nil,
-					})
-					exit()
-				}
-			}()
-			fv.Call(in)
-		} else {
-			Panicln("params len don't == Func params")
-		}
-	} else {
-		Panicln("f don't is Func")
-	}
-}
-
-func Error(args ...interface{}) {
-	if level >= ErrorLevel {
-		event(Event{
-			Level:   ErrorLevel,
-			Message: fmt.Sprint(args...),
-			Time:    time.Now(),
-			Data:    nil,
-		})
-	}
-}
-func Errorf(format string, args ...interface{}) {
-	if level >= ErrorLevel {
-		event(Event{
-			Level:   ErrorLevel,
-			Message: fmt.Sprintf(format, args...),
-			Time:    time.Now(),
-			Data:    nil,
-		})
-	}
-}
-func Errorln(args ...interface{}) {
-	if level >= ErrorLevel {
-		event(Event{
-			Level:   ErrorLevel,
-			Message: fmt.Sprintln(args...),
-			Time:    time.Now(),
-			Data:    nil,
-		})
-	}
-}
-
-func Warn(args ...interface{}) {
-	if level >= WarnLevel {
-		event(Event{
-			Level:   WarnLevel,
-			Message: fmt.Sprint(args...),
-			Time:    time.Now(),
-			Data:    nil,
-		})
-	}
-}
-func Warnf(format string, args ...interface{}) {
-	if level >= WarnLevel {
-		event(Event{
-			Level:   WarnLevel,
-			Message: fmt.Sprintf(format, args...),
-			Time:    time.Now(),
-			Data:    nil,
-		})
-	}
-}
-func Warnln(args ...interface{}) {
-	if level >= WarnLevel {
-		event(Event{
-			Level:   WarnLevel,
-			Message: fmt.Sprintln(args...),
-			Time:    time.Now(),
-			Data:    nil,
-		})
-	}
-}
-
-func Info(args ...interface{}) {
-	if level >= InfoLevel {
-		event(Event{
-			Level:   InfoLevel,
-			Message: fmt.Sprint(args...),
-			Time:    time.Now(),
-			Data:    nil,
-		})
-	}
-}
-func Infof(format string, args ...interface{}) {
-	if level >= InfoLevel {
-		event(Event{
-			Level:   InfoLevel,
-			Message: fmt.Sprintf(format, args...),
-			Time:    time.Now(),
-			Data:    nil,
-		})
-	}
-}
-func Infoln(args ...interface{}) {
-	if level >= InfoLevel {
-		event(Event{
-			Level:   InfoLevel,
-			Message: fmt.Sprintln(args...),
-			Time:    time.Now(),
-			Data:    nil,
-		})
-	}
-}
-
-func Debug(args ...interface{}) {
-	if level >= DebugLevel {
-		event(Event{
-			Level:   DebugLevel,
-			Message: fmt.Sprint(args...),
-			Time:    time.Now(),
-			Data:    nil,
-		})
-	}
-}
-func Debugf(format string, args ...interface{}) {
-	if level >= DebugLevel {
-		event(Event{
-			Level:   DebugLevel,
-			Message: fmt.Sprintf(format, args...),
-			Time:    time.Now(),
-			Data:    nil,
-		})
-	}
-}
-func Debugln(args ...interface{}) {
-	if level >= DebugLevel {
-		event(Event{
-			Level:   DebugLevel,
-			Message: fmt.Sprintln(args...),
-			Time:    time.Now(),
-			Data:    nil,
-		})
-	}
-}
+var logs = []logger{}
 
 func getCaller(i int) *FuncCall {
 	pc, file, line, ok := runtime.Caller(i)
@@ -305,4 +36,86 @@ func getCaller(i int) *FuncCall {
 		// Func: fcs[len(fcs)-1],
 		Func: runtime.FuncForPC(pc).Name(),
 	}
+}
+
+func paincf(logger logger, s string, c int, data interface{}) {
+	errstr := fmt.Sprintf("Runtime error:%v\nTraceback:\n", s)
+	i := c
+	for {
+		pc, file, line, ok := runtime.Caller(i)
+		if !ok || i > logger.Option().NumStack {
+			break
+		}
+		errstr += fmt.Sprintf("\tstack: %d [file:%s][line:%d][func:%s]\n", i-c+1, file, line, runtime.FuncForPC(pc).Name())
+		i++
+	}
+	logger.Event(Event{
+		Level:   LEVELPANIC,
+		Message: errstr,
+		Time:    time.Now(),
+		Data:    data,
+	})
+	exit()
+}
+
+func gol(logger logger, f interface{}, params ...interface{}) {
+	fv := reflect.ValueOf(f)
+	ft := reflect.TypeOf(f)
+	if fv.Kind() == reflect.Func {
+		if ft.NumIn() == len(params) {
+			in := make([]reflect.Value, len(params))
+			for i, p := range params {
+				pv := reflect.ValueOf(p)
+				if pv.Kind() == ft.In(i).Kind() {
+					in[i] = pv
+				} else {
+					paincf(logger, fmt.Sprintf("params[%d] type %v don't is Func params[%d] type %v\n", i, pv.Kind(), i, ft.In(i).Kind()), 2, nil)
+				}
+			}
+			defer func() {
+				if err := recover(); err != nil {
+					errstr := fmt.Sprintf("Runtime error:%v\ntraceback:\n", err)
+					i := 4
+					for {
+						pc, file, line, ok := runtime.Caller(i)
+						if !ok || i > logger.Option().NumStack {
+							break
+						}
+						errstr += fmt.Sprintf("\tstack: %d %v [file:%s][line:%d][func:%s]\n", i-3, ok, file, line, runtime.FuncForPC(pc).Name())
+						i++
+					}
+					logger.Event(Event{
+						Level:   LEVELPANIC,
+						Message: errstr,
+						Time:    time.Now(),
+						Data:    nil,
+					})
+					exit()
+				}
+			}()
+			fv.Call(in)
+		} else {
+			paincf(logger, "params len don't == Func params", 2, nil)
+		}
+	} else {
+		paincf(logger, "f don't is Func", 2, nil)
+	}
+}
+
+func exit() {
+	Close()
+	os.Exit(1)
+}
+
+func Close() {
+	for _, l := range logs {
+		l.Close()
+	}
+}
+
+var uuid int
+
+func GenID() string {
+	uuid++
+	return fmt.Sprint("glog", uuid)
 }

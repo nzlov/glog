@@ -12,12 +12,12 @@ type Console struct {
 }
 
 func New() *Console {
-	c := &Console{}
-	c.BaseListener = listener.NewBaseListener(c)
-	return c
+	return NewWithOption(glog.DefaultOption)
 }
-func (self *Console) Name() string {
-	return "Console"
+func NewWithOption(o *glog.Option) *Console {
+	c := &Console{}
+	c.BaseListener = listener.NewBaseListener(c, o)
+	return c
 }
 
 func (self *Console) Event(e glog.Event) {

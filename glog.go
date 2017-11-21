@@ -13,7 +13,7 @@ import (
 var QuitWait sync.WaitGroup
 
 var MAXSTACK int = 99
-var LOGCHANSIZE int = 20
+var LOGCHANSIZE int = 50
 
 var listeners map[string]Listener
 var level Level

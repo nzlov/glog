@@ -136,6 +136,37 @@ func (self Field) Infoln(args ...interface{}) {
 	}
 }
 
+func (self Field) Debug(args ...interface{}) {
+	if self.logger.Option().Level&LEVELDEBUG == LEVELDEBUG {
+		self.logger.Event(Event{
+			Level:   LEVELDEBUG,
+			Message: fmt.Sprint(args...),
+			Time:    time.Now(),
+			Data:    self,
+		})
+	}
+}
+func (self Field) Debugf(format string, args ...interface{}) {
+	if self.logger.Option().Level&LEVELDEBUG == LEVELDEBUG {
+		self.logger.Event(Event{
+			Level:   LEVELDEBUG,
+			Message: fmt.Sprintf(format, args...),
+			Time:    time.Now(),
+			Data:    self,
+		})
+	}
+}
+func (self Field) Debugln(args ...interface{}) {
+	if self.logger.Option().Level&LEVELDEBUG == LEVELDEBUG {
+		self.logger.Event(Event{
+			Level:   LEVELDEBUG,
+			Message: fmt.Sprintln(args...),
+			Time:    time.Now(),
+			Data:    self,
+		})
+	}
+}
+
 type Level uint8
 
 const (
@@ -144,11 +175,14 @@ const (
 	LEVELERROR
 	LEVELWARN
 	LEVELINFO
-	LEVELALL Level = LEVELPANIC | LEVELERROR | LEVELWARN | LEVELINFO
+	LEVELDEBUG
+	LEVELALL Level = LEVELPANIC | LEVELERROR | LEVELWARN | LEVELINFO | LEVELDEBUG
 )
 
 func (level Level) String() string {
 	switch level {
+	case LEVELDEBUG:
+		return "D"
 	case LEVELINFO:
 		return "I"
 	case LEVELWARN:

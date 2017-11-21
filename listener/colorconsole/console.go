@@ -61,6 +61,8 @@ func (self *ColorConsole) typefg(e glog.Event) {
 		self.cl = WarnLevelColor
 	case glog.LEVELINFO:
 		self.cl = InfoLevelColor
+	case glog.LEVELDEBUG:
+		self.cl = DebugLevelColor
 	}
 	if e.FuncCall != nil {
 		self.cl.Printf("[%s][%s]%s %s", e.Level, e.Time.Format("2006-01-02 15:04:05"), e.FuncCall, e.Message)
@@ -83,6 +85,8 @@ func (self *ColorConsole) typedef(e glog.Event) {
 		WarnLevelColor.Print(e.Level)
 	case glog.LEVELINFO:
 		InfoLevelColor.Print(e.Level)
+	case glog.LEVELDEBUG:
+		DebugLevelColor.Print(e.Level)
 	}
 	fmt.Print("]")
 	if e.FuncCall != nil {

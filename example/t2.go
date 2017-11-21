@@ -32,6 +32,7 @@ func a() {
 			log.NewField().
 				S("k", "v").
 				Infoln(i)
+			log.Debugln(i)
 			time.Sleep(time.Second)
 		}
 	}()

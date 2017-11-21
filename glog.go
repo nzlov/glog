@@ -39,7 +39,7 @@ func getCaller(i int) *FuncCall {
 }
 
 func paincf(logger logger, s string, c int, data interface{}) {
-	errstr := fmt.Sprintf("Runtime error:%v\nTraceback:\n", s)
+	errstr := fmt.Sprintf("Panic : %v\nTraceback:\n", s)
 	i := c
 	for {
 		pc, file, line, ok := runtime.Caller(i)
@@ -74,7 +74,7 @@ func gol(logger logger, f interface{}, params ...interface{}) {
 			}
 			defer func() {
 				if err := recover(); err != nil {
-					errstr := fmt.Sprintf("Runtime error:%v\ntraceback:\n", err)
+					errstr := fmt.Sprintf("Panic : %v\ntraceback:\n", err)
 					i := 4
 					for {
 						pc, file, line, ok := runtime.Caller(i)

@@ -40,6 +40,7 @@ func NewWithOption(o *Option) *Logger {
 	l.listeners[LEVELERROR] = make(map[string]Listener, 0)
 	l.listeners[LEVELWARN] = make(map[string]Listener, 0)
 	l.listeners[LEVELINFO] = make(map[string]Listener, 0)
+	l.listeners[LEVELDEBUG] = make(map[string]Listener, 0)
 	go l.ev()
 	logs = append(logs, l)
 	return l
@@ -242,6 +243,37 @@ func (logger *Logger) Infoln(args ...interface{}) {
 	if logger.option.Level&LEVELINFO == LEVELINFO {
 		logger.Event(Event{
 			Level:   LEVELINFO,
+			Message: fmt.Sprintln(args...),
+			Time:    time.Now(),
+			Data:    nil,
+		})
+	}
+}
+
+func (logger *Logger) Debug(args ...interface{}) {
+	if logger.option.Level&LEVELDEBUG == LEVELDEBUG {
+		logger.Event(Event{
+			Level:   LEVELDEBUG,
+			Message: fmt.Sprint(args...),
+			Time:    time.Now(),
+			Data:    nil,
+		})
+	}
+}
+func (logger *Logger) Debugf(format string, args ...interface{}) {
+	if logger.option.Level&LEVELDEBUG == LEVELDEBUG {
+		logger.Event(Event{
+			Level:   LEVELDEBUG,
+			Message: fmt.Sprintf(format, args...),
+			Time:    time.Now(),
+			Data:    nil,
+		})
+	}
+}
+func (logger *Logger) Debugln(args ...interface{}) {
+	if logger.option.Level&LEVELDEBUG == LEVELDEBUG {
+		logger.Event(Event{
+			Level:   LEVELDEBUG,
 			Message: fmt.Sprintln(args...),
 			Time:    time.Now(),
 			Data:    nil,
